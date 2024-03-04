@@ -45,6 +45,8 @@ class Enemy {
         float attack;
         float width;
         float height;
+
+        int hp;
         Color color;
 
         Vector2 velocity;

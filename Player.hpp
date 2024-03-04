@@ -47,6 +47,8 @@ class Player {
     public:
         Vector2 position;
         float radius;
+
+        int hp;
         Color color;
 
         Vector2 velocity;
