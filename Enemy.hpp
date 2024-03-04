@@ -45,6 +45,7 @@ class Enemy {
         float attack;
         float width;
         float height;
+        float rotation;
 
         int hp;
         Color color;
@@ -54,7 +55,7 @@ class Enemy {
         float speed;
         float timer;
 
-        Enemy(Vector2 pos, float wdth, float hgt, float dct, float agr, float atk, float spd);
+        Enemy(Vector2 pos, float wdth, float hgt, float dct, float agr, float atk, float rot, float spd);
 
         void Update(float delta_time);
 
