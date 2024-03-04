@@ -40,7 +40,11 @@ class EnemyAttacking : public EnemyState {
 class Enemy {
     public:
         Vector2 position;
-        float radius;
+        float detection;
+        float aggro;
+        float attack;
+        float width;
+        float height;
         Color color;
 
         Vector2 velocity;
@@ -48,7 +52,7 @@ class Enemy {
         float speed;
         float timer;
 
-        Enemy(Vector2 pos, float rad, float spd);
+        Enemy(Vector2 pos, float wdth, float hgt, float dct, float agr, float atk, float spd);
 
         void Update(float delta_time);
 
