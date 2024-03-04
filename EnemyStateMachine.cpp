@@ -3,6 +3,9 @@
 #include <iostream>
 
 #include "Enemy.hpp"
+// we can remove this if not needed \/ \/
+#include "Player.hpp"
+#include "PlayerStateMachine.cpp"
 
 void Enemy::Update(float delta_time) {
     current_state->Update(*this, delta_time);
@@ -49,17 +52,21 @@ void EnemyAttacking::Enter(Enemy& enemy) {
 }
 
 void EnemyWandering::Update(Enemy& enemy, float delta_time) {
-
+    // random movement
+    // default, swaps to chasing.
 }
 
 void EnemyChasing::Update(Enemy& enemy, float delta_time) {
-    
+    // chases player and rotates body to face player direction
+    // swaps to wandering if player is outside aggro zone
+    // swaps to readying when in attack zone.=
 }
 
 void EnemyReadying::Update(Enemy& enemy, float delta_time) {
-    
+    // looks at player position
+    // swaps to attack once timer and ready movement is done
 }
 
 void EnemyAttacking::Update(Enemy& enemy, float delta_time) {
-    
+    // swaps to wandering once enemy dashes to last location it was looking at
 }
