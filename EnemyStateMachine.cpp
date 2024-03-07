@@ -57,8 +57,8 @@ void EnemyAttacking::Enter(Enemy& enemy) {
 void EnemyWandering::Update(Enemy& enemy, Player& player,float delta_time) {
     enemy.directionChangeTimer += delta_time;
 
-    bool isColliding = CheckCollisionCircles(enemy.position, enemy.detection, player.position, player.radius);
-    if (isColliding) {
+    bool isChasing = CheckCollisionCircles(enemy.position, enemy.detection, player.position, player.radius);
+    if (isChasing) {
         enemy.SetState(&enemy.chasing);
         return;
     }
@@ -99,18 +99,36 @@ void EnemyChasing::Update(Enemy& enemy, Player& player,float delta_time) {
     // chases player and rotates body to face player direction
     // swaps to wandering if player is outside aggro zone
     // swaps to readying when in attack zone.=
-    bool isColliding = CheckCollisionCircles(enemy.position, enemy.detection, player.position, player.radius);
-    if (!isColliding) {
+    bool isChasing = CheckCollisionCircles(enemy.position, enemy.aggro, player.position, player.radius);
+    if (!isChasing) {
         enemy.SetState(&enemy.wandering);
+        return;
+    }
+
+    bool isAttacking = CheckCollisionCircles(enemy.position, enemy.attack, player.position, player.radius);
+    if (isAttacking) {
+        enemy.SetState(&enemy.readying);
+        enemy.timer = 1.0f;
         return;
     }
 }
 
 void EnemyReadying::Update(Enemy& enemy, Player& player,float delta_time) {
+    enemy.timer -= delta_time;
+    
+    if (enemy.timer <= 0) {
+        enemy.timer = 0.2f;
+        enemy.SetState(&enemy.attacking);
+    }
     // looks at player position
     // swaps to attack once timer and ready movement is done
 }
 
 void EnemyAttacking::Update(Enemy& enemy, Player& player,float delta_time) {
     // swaps to wandering once enemy dashes to last location it was looking at
+    enemy.timer -= delta_time;
+    
+    if (enemy.timer <= 0) {
+        enemy.SetState(&enemy.wandering);
+    }
 }
