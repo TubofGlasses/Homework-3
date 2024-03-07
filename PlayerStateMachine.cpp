@@ -45,9 +45,6 @@ void PlayerAttacking::Enter(Player& player) {
 }
 
 void PlayerIdle::Update(Player& player, float delta_time) {
-    // std::cout << "velocity " << player.velocity.y << " speed " <<player.speed << std::endl;
-    std::cout << "Position X: " << player.position.x << std::endl;
-    std::cout << "Postion Y: " << player.position.y << std::endl;
     player.prevPos = player.position;
     if (IsKeyDown(KEY_W) || IsKeyDown(KEY_A) || IsKeyDown(KEY_S) || IsKeyDown(KEY_D)) {
         player.timer = 0.2;
@@ -71,7 +68,6 @@ void PlayerMoving::Update(Player& player, float delta_time) {
         player.prevPos = player.position;
         player.timer = 0.2f;
     }
-    std::cout << "velocity " << player.velocity.y << " speed " <<player.speed << std::endl;
     Vector2 direction = {0.0f, 0.0f};
 
     if (IsKeyDown(KEY_W)) {

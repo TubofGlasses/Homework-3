@@ -4,37 +4,39 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#include "Player.hpp"
+
 class Enemy;
 
 class EnemyState {
     public:
         virtual ~EnemyState() {} // desctructor called when obj is deleted.
         virtual void Enter(Enemy& enemy) = 0;
-        virtual void Update(Enemy& enemy, float delta_time) = 0;
+        virtual void Update(Enemy& enemy, Player& player, float delta_time) = 0;
 };
 
 class EnemyWandering : public EnemyState {
     public:
         void Enter(Enemy& enemy);
-        void Update(Enemy& enemy, float delta_time);
+        void Update(Enemy& enemy, Player& player, float delta_time);
 };
 
 class EnemyChasing : public EnemyState {
     public:
         void Enter(Enemy& enemy);
-        void Update(Enemy& enemy, float delta_time);
+        void Update(Enemy& enemy, Player& player, float delta_time);
 };
 
 class EnemyReadying : public EnemyState {
     public:
         void Enter(Enemy& enemy);
-        void Update(Enemy& enemy, float delta_time);
+        void Update(Enemy& enemy, Player& player, float delta_time);
 };
 
 class EnemyAttacking : public EnemyState {
     public:
         void Enter(Enemy& enemy);
-        void Update(Enemy& enemy, float delta_time);
+        void Update(Enemy& enemy, Player& player, float delta_time);
 };
 
 class Enemy {
@@ -54,10 +56,12 @@ class Enemy {
         Vector2 prevPos;
         float speed;
         float timer;
+        float directionChangeTimer = 0.0f; // Timer to track time since last direction change
+        const float directionChangeInterval = 5.0f;
 
         Enemy(Vector2 pos, float wdth, float hgt, float dct, float agr, float atk, float rot, float spd);
 
-        void Update(float delta_time);
+        void Update(Player& player, float delta_time);
 
         void Draw();
 
