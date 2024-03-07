@@ -59,6 +59,8 @@ class Enemy {
         float directionChangeTimer = 0.0f; // Timer to track time since last direction change
         const float directionChangeInterval = 5.0f;
 
+        bool isChasing;
+
         Enemy(Vector2 pos, float wdth, float hgt, float dct, float agr, float atk, float rot, float spd);
 
         void Update(Player& player, float delta_time);

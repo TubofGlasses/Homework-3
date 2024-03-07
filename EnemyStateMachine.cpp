@@ -57,10 +57,16 @@ void EnemyAttacking::Enter(Enemy& enemy) {
 void EnemyWandering::Update(Enemy& enemy, Player& player,float delta_time) {
     enemy.directionChangeTimer += delta_time;
 
-    bool isChasing = CheckCollisionCircles(enemy.position, enemy.detection, player.position, player.radius);
-    if (isChasing) {
+    if (!enemy.isChasing) {
+         enemy.isChasing = CheckCollisionCircles(enemy.position, enemy.detection, player.position, player.radius);
+        if (enemy.isChasing) {
+            enemy.SetState(&enemy.chasing);
+            return;
+        }   
+    }
+    
+    if (enemy.isChasing) {
         enemy.SetState(&enemy.chasing);
-        return;
     }
 
     if (enemy.directionChangeTimer >= enemy.directionChangeInterval ||
@@ -100,8 +106,8 @@ void EnemyChasing::Update(Enemy& enemy, Player& player,float delta_time) {
     // swaps to wandering if player is outside aggro zone
     // swaps to readying when in attack zone.=
     Vector2 chase = Vector2Subtract(player.position, enemy.position);
-    bool isChasing = CheckCollisionCircles(enemy.position, enemy.aggro, player.position, player.radius);
-    if (!isChasing) {
+    enemy.isChasing = CheckCollisionCircles(enemy.position, enemy.aggro, player.position, player.radius);
+    if (!enemy.isChasing) {
         enemy.rotation = 0.0f;
         enemy.SetState(&enemy.wandering);
         return;
