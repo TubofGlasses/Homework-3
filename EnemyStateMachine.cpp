@@ -39,7 +39,7 @@ Enemy::Enemy(Vector2 pos, float wdth, float hgt, float dct, float agr, float atk
 }
 
 void EnemyWandering::Enter(Enemy& enemy) {
-    enemy.color = YELLOW;
+    enemy.color = WHITE;
 }
 
 void EnemyChasing::Enter(Enemy& enemy) {
@@ -99,11 +99,21 @@ void EnemyChasing::Update(Enemy& enemy, Player& player,float delta_time) {
     // chases player and rotates body to face player direction
     // swaps to wandering if player is outside aggro zone
     // swaps to readying when in attack zone.=
+    Vector2 chase = Vector2Subtract(player.position, enemy.position);
     bool isChasing = CheckCollisionCircles(enemy.position, enemy.aggro, player.position, player.radius);
     if (!isChasing) {
+        enemy.rotation = 0.0f;
         enemy.SetState(&enemy.wandering);
         return;
     }
+
+    if (Vector2Length(chase) > 0) {
+        chase = Vector2Normalize(chase);
+        enemy.position = Vector2Add(enemy.position, Vector2Scale(chase, enemy.speed * delta_time));
+    }
+
+    // Optionally, set enemy rotation to face the player
+    enemy.rotation = atan2f(chase.y, chase.x) * RAD2DEG;
 
     bool isAttacking = CheckCollisionCircles(enemy.position, enemy.attack, player.position, player.radius);
     if (isAttacking) {
@@ -129,6 +139,7 @@ void EnemyAttacking::Update(Enemy& enemy, Player& player,float delta_time) {
     enemy.timer -= delta_time;
     
     if (enemy.timer <= 0) {
+        enemy.rotation = 0.0f;
         enemy.SetState(&enemy.wandering);
     }
 }
