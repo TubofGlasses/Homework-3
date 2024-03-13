@@ -56,6 +56,8 @@ class Enemy {
         Vector2 prevPos;
         float speed;
         float timer;
+        float timer2;
+        
         float directionChangeTimer = 0.0f; // Timer to track time since last direction change
         const float directionChangeInterval = 5.0f;
 

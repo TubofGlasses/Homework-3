@@ -52,6 +52,7 @@ void EnemyReadying::Enter(Enemy& enemy) {
 
 void EnemyAttacking::Enter(Enemy& enemy) {
     enemy.color = RED;
+    
 }
 
 void EnemyWandering::Update(Enemy& enemy, Player& player,float delta_time) {
@@ -133,7 +134,9 @@ void EnemyReadying::Update(Enemy& enemy, Player& player,float delta_time) {
     enemy.timer -= delta_time;
     
     if (enemy.timer <= 0) {
+        
         enemy.timer = 0.2f;
+        enemy.timer2 = 0.19f;
         enemy.SetState(&enemy.attacking);
     }
     // looks at player position
@@ -142,10 +145,26 @@ void EnemyReadying::Update(Enemy& enemy, Player& player,float delta_time) {
 
 void EnemyAttacking::Update(Enemy& enemy, Player& player,float delta_time) {
     // swaps to wandering once enemy dashes to last location it was looking at
+
+    Vector2 playerLastPosition;
+    Vector2 distance;
+
     enemy.timer -= delta_time;
-    
-    if (enemy.timer <= 0) {
-        enemy.rotation = 0.0f;
-        enemy.SetState(&enemy.wandering);
+    enemy.timer2 -= delta_time;
+
+    if (enemy.timer2 <= 0){
+        Vector2 playerLastPosition = player.position;
+        Vector2 distance = Vector2Subtract(playerLastPosition, enemy.position);
+        std::cout << "PREVIOUS X: " << playerLastPosition.x << std::endl;
+        std::cout << "PREVIOUS Y: " << playerLastPosition.y << std::endl;
+        if (enemy.timer <= 0) {
+            std::cout << "NEXT X: " << playerLastPosition.x << std::endl;
+            std::cout << "NEXT Y: " << playerLastPosition.y << std::endl;
+            enemy.position = Vector2Add(enemy.position, Vector2Scale(distance, enemy.speed * delta_time));
+            enemy.rotation = 0.0f;
+            enemy.SetState(&enemy.wandering);
+        }
     }
+    
+    
 }
