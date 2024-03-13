@@ -10,7 +10,9 @@ void Player::Update(float delta_time) {
 
 void Player::Draw() {
     DrawCircleV(position, radius, color);
+    DrawText(("HP: " + std::to_string(hp)).c_str(), 10, 10, 20, WHITE);
 }
+
 
 void Player::SetState(PlayerState* new_state) {
     current_state = new_state;
@@ -21,6 +23,7 @@ Player::Player(Vector2 pos, float rad, float spd) {
     position = pos;
     radius = rad;
     speed = spd;
+    hp = 5;
     SetState(&idle);
 }
 
