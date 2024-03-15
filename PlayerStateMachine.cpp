@@ -11,7 +11,6 @@ void Player::Update(Enemy& enemy, float delta_time) {
 
 void Player::Draw() {
     DrawCircleV(position, radius, color);
-    DrawText(("HP: " + std::to_string(hp)).c_str(), 10, 10, 20, WHITE);
     if (dynamic_cast<PlayerAttacking*>(current_state) != nullptr) {
         DrawCircleLines(static_cast<int>(position.x), static_cast<int>(position.y), 75.0f, RED);
     }

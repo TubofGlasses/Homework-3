@@ -14,7 +14,6 @@ void Enemy::Update(Player& player, float delta_time) {
 
 //Not done
 void Enemy::Draw() {
-    DrawText(("HP: " + std::to_string(hp)).c_str(), 10, 60, 20, WHITE);
     DrawCircleLines(static_cast<int>(position.x), static_cast<int>(position.y), aggro, BLUE);
     DrawCircleLines(static_cast<int>(position.x), static_cast<int>(position.y), detection, GREEN);
     DrawCircleLines(static_cast<int>(position.x), static_cast<int>(position.y), attack, RED);
@@ -61,7 +60,6 @@ void EnemyReadying::Enter(Enemy& enemy) {
 
 void EnemyAttacking::Enter(Enemy& enemy) {
     enemy.color = RED;
-    enemy.hasDealtDamage = false;
     
 }
 
@@ -89,35 +87,35 @@ void EnemyWandering::Update(Enemy& enemy, Player& player, float delta_time) {
     }
 
     // Change direction at regular intervals or if hitting screen bounds
-    if (enemy.directionChangeTimer >= enemy.directionChangeInterval ||
-        enemy.position.x <= 0 || enemy.position.x >= GetScreenWidth() ||
-        enemy.position.y <= 0 || enemy.position.y >= GetScreenHeight()) {
-
+    if (enemy.directionChangeTimer >= enemy.directionChangeInterval) {
+        float randomAngle = (rand() % 360) * DEG2RAD; // Random angle in radians
+        Vector2 randomDirection = {cos(randomAngle), sin(randomAngle)};
+        enemy.velocity = Vector2Scale(randomDirection, enemy.speed); // Apply new velocity
         enemy.directionChangeTimer = 0.0f; // Reset timer
 
-        // Reverse direction if hitting screen bounds
-        if (enemy.position.x <= 0 || enemy.position.x >= GetScreenWidth()) {
-            enemy.velocity.x *= -1;
-        }
-        if (enemy.position.y <= 0 || enemy.position.y >= GetScreenHeight()) {
-            enemy.velocity.y *= -1;
-        }
+    //     // Reverse direction if hitting screen bounds
+    //     if (enemy.position.x <= 0 || enemy.position.x >= GetScreenWidth()) {
+    //         enemy.velocity.x *= -1;
+    //     }
+    //     if (enemy.position.y <= 0 || enemy.position.y >= GetScreenHeight()) {
+    //         enemy.velocity.y *= -1;
+    //     }
 
-        // Choose a new random direction if not at bounds
-        if (enemy.position.x > 0 && enemy.position.x < GetScreenWidth() &&
-            enemy.position.y > 0 && enemy.position.y < GetScreenHeight()) {
-            float randomAngle = (rand() % 360) * DEG2RAD; // Random angle in radians
-            Vector2 randomDirection = {cos(randomAngle), sin(randomAngle)};
-            enemy.velocity = Vector2Scale(randomDirection, enemy.speed); // Apply new velocity
+    //     // Choose a new random direction if not at bounds
+    //     if (enemy.position.x > 0 && enemy.position.x < GetScreenWidth() &&
+    //         enemy.position.y > 0 && enemy.position.y < GetScreenHeight()) {
+    //         float randomAngle = (rand() % 360) * DEG2RAD; // Random angle in radians
+    //         Vector2 randomDirection = {cos(randomAngle), sin(randomAngle)};
+    //         enemy.velocity = Vector2Scale(randomDirection, enemy.speed); // Apply new velocity
+    //     }
         }
-    }
 
     // Move the enemy based on its velocity
     enemy.position = Vector2Add(enemy.position, Vector2Scale(enemy.velocity, delta_time));
 
     // Ensure the enemy stays within the screen bounds
-    enemy.position.x = fmax(0, fmin(enemy.position.x, GetScreenWidth()));
-    enemy.position.y = fmax(0, fmin(enemy.position.y, GetScreenHeight()));
+    // enemy.position.x = fmax(0, fmin(enemy.position.x, GetScreenWidth()));
+    // enemy.position.y = fmax(0, fmin(enemy.position.y, GetScreenHeight()));
 }
 
 void EnemyChasing::Update(Enemy& enemy, Player& player,float delta_time) {
@@ -154,6 +152,7 @@ void EnemyReadying::Update(Enemy& enemy, Player& player, float delta_time) {
     enemy.rotation = atan2f(chase.y, chase.x) * RAD2DEG;
     
     if (enemy.timer <= 0) {
+        enemy.lastPlayerPosition = player.position; // Capture the last known position of the player
         enemy.timer = 0.6f;
         enemy.SetState(&enemy.attacking);
     }
@@ -165,32 +164,22 @@ void EnemyAttacking::Update(Enemy& enemy, Player& player, float delta_time) {
         return;
     }
 
+    // Convert the current rotation to a direction vector for the attack
     Vector2 attackDirection = {cosf(enemy.rotation * DEG2RAD), sinf(enemy.rotation * DEG2RAD)};
 
+    // Normalize the direction vector
     attackDirection = Vector2Normalize(attackDirection);
 
-    float attackSpeedMultiplier = 10.0f;
+    // Increase the enemy's speed during the attack
+    float attackSpeedMultiplier = 10.0f; // Adjust the multiplier as needed
     float increasedSpeed = enemy.speed * attackSpeedMultiplier;
 
+    // Calculate the enemy's new position based on the attack direction and increased speed
     enemy.position = Vector2Add(enemy.position, Vector2Scale(attackDirection, increasedSpeed * delta_time));
-
-    if (CheckCollisionCircles(enemy.position, enemy.width / 2, player.position, player.radius) && !enemy.hasDealtDamage) {
-        float damage = 1.0f; 
-
-        if (player.isBlocking) {
-            damage = 0.5f;
-        } else if (player.isDodging) {
-            damage = 0.0f;
-        }
-
-        player.hp -= damage;
-        enemy.hasDealtDamage = true;
-
-        return;
-    }
 
     enemy.timer -= delta_time;
     if (enemy.timer <= 0) {
+        // Transition to another state, such as wandering, after the attack
         enemy.SetState(&enemy.wandering);
         enemy.attackCooldown = enemy.attackCooldownDuration;
     }
