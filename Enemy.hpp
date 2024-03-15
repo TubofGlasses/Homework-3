@@ -6,6 +6,7 @@
 
 #include "Player.hpp"
 
+class Player;
 class Enemy;
 
 class EnemyState {
@@ -67,6 +68,7 @@ class Enemy {
 
         bool isChasing;
         bool isAttacking;
+        bool hasDealtDamage;
 
         Enemy(Vector2 pos, float wdth, float hgt, float dct, float agr, float atk, float rot, float spd);
 

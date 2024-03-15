@@ -18,7 +18,7 @@ int main() {
     while(!WindowShouldClose()) {
         float delta_time = GetFrameTime();
 
-        player.Update(delta_time);
+        player.Update(enemy, delta_time);
         enemy.Update(player, delta_time);
 
         BeginDrawing();

@@ -3,14 +3,18 @@
 #include <iostream>
 
 #include "Player.hpp"
+#include "Enemy.hpp"
 
-void Player::Update(float delta_time) {
-    current_state->Update(*this, delta_time);
+void Player::Update(Enemy& enemy, float delta_time) {
+    current_state->Update(*this, enemy, delta_time);
 }
 
 void Player::Draw() {
     DrawCircleV(position, radius, color);
     DrawText(("HP: " + std::to_string(hp)).c_str(), 10, 10, 20, WHITE);
+    if (dynamic_cast<PlayerAttacking*>(current_state) != nullptr) {
+        DrawCircleLines(static_cast<int>(position.x), static_cast<int>(position.y), 75.0f, RED);
+    }
 }
 
 
@@ -28,6 +32,7 @@ Player::Player(Vector2 pos, float rad, float spd) {
 }
 
 void PlayerIdle::Enter(Player& player) {
+    player.isBlocking = false;
     player.color = ORANGE;
 }
 
@@ -47,7 +52,7 @@ void PlayerAttacking::Enter(Player& player) {
     player.color = YELLOW;
 }
 
-void PlayerIdle::Update(Player& player, float delta_time) {
+void PlayerIdle::Update(Player& player, Enemy& enemy, float delta_time) {
     player.prevPos = player.position;
     if (IsKeyDown(KEY_W) || IsKeyDown(KEY_A) || IsKeyDown(KEY_S) || IsKeyDown(KEY_D)) {
         player.timer = 0.2;
@@ -63,7 +68,7 @@ void PlayerIdle::Update(Player& player, float delta_time) {
     }
 }
 
-void PlayerMoving::Update(Player& player, float delta_time) {
+void PlayerMoving::Update(Player& player, Enemy& enemy, float delta_time) {
     if (player.timer >= 0) {
         player.timer -= delta_time;
     }
@@ -108,14 +113,14 @@ void PlayerMoving::Update(Player& player, float delta_time) {
     }
 }
 
-void PlayerBlocking::Update(Player& player, float delta_time) {
+void PlayerBlocking::Update(Player& player, Enemy& enemy, float delta_time) {
     if (!IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && player.isBlocking == true) {
         player.isBlocking = false;
         player.SetState(&player.idle);
     }
 }
 
-void PlayerDodging::Update(Player& player, float delta_time) {
+void PlayerDodging::Update(Player& player, Enemy& enemy, float delta_time) {
     if (player.timer > 0) {
         Vector2 direction = {0.0f, 0.0f};
 
@@ -155,10 +160,20 @@ void PlayerDodging::Update(Player& player, float delta_time) {
     }
 }
 
-void PlayerAttacking::Update(Player& player, float delta_time) {
+void PlayerAttacking::Update(Player& player, Enemy& enemy, float delta_time) {
     if (player.timer >= 0) {
         player.timer -= delta_time;
     }
+
+    if (CheckCollisionCircles(player.position, player.radius, enemy.position, enemy.width) && !player.hasDamaged) {
+        float damage = 1.0f; 
+
+        enemy.hp -= damage;
+        player.hasDamaged = true;
+        std::cout << enemy.hp << std::endl;
+        return;
+    }
+
     if (player.timer <= 0) {
         player.SetState(&player.idle);
     }
