@@ -14,6 +14,7 @@ void Enemy::Update(Player& player, float delta_time) {
 
 //Not done
 void Enemy::Draw() {
+    DrawText(("HP: " + std::to_string(hp)).c_str(), 10, 60, 20, WHITE);
     DrawCircleLines(static_cast<int>(position.x), static_cast<int>(position.y), aggro, BLUE);
     DrawCircleLines(static_cast<int>(position.x), static_cast<int>(position.y), detection, GREEN);
     DrawCircleLines(static_cast<int>(position.x), static_cast<int>(position.y), attack, RED);

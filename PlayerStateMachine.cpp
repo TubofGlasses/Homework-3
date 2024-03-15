@@ -49,6 +49,7 @@ void PlayerDodging::Enter(Player& player) {
 }
 
 void PlayerAttacking::Enter(Player& player) {
+    player.hasDamaged = false;
     player.color = YELLOW;
 }
 
