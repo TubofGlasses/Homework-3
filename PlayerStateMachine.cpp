@@ -10,7 +10,6 @@ void Player::Update(float delta_time) {
 
 void Player::Draw() {
     DrawCircleV(position, radius, color);
-    DrawText(("HP: " + std::to_string(hp)).c_str(), 10, 10, 20, WHITE);
 }
 
 

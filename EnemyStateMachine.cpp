@@ -87,35 +87,35 @@ void EnemyWandering::Update(Enemy& enemy, Player& player, float delta_time) {
     }
 
     // Change direction at regular intervals or if hitting screen bounds
-    if (enemy.directionChangeTimer >= enemy.directionChangeInterval ||
-        enemy.position.x <= 0 || enemy.position.x >= GetScreenWidth() ||
-        enemy.position.y <= 0 || enemy.position.y >= GetScreenHeight()) {
-
+    if (enemy.directionChangeTimer >= enemy.directionChangeInterval) {
+        float randomAngle = (rand() % 360) * DEG2RAD; // Random angle in radians
+        Vector2 randomDirection = {cos(randomAngle), sin(randomAngle)};
+        enemy.velocity = Vector2Scale(randomDirection, enemy.speed); // Apply new velocity
         enemy.directionChangeTimer = 0.0f; // Reset timer
 
-        // Reverse direction if hitting screen bounds
-        if (enemy.position.x <= 0 || enemy.position.x >= GetScreenWidth()) {
-            enemy.velocity.x *= -1;
-        }
-        if (enemy.position.y <= 0 || enemy.position.y >= GetScreenHeight()) {
-            enemy.velocity.y *= -1;
-        }
+    //     // Reverse direction if hitting screen bounds
+    //     if (enemy.position.x <= 0 || enemy.position.x >= GetScreenWidth()) {
+    //         enemy.velocity.x *= -1;
+    //     }
+    //     if (enemy.position.y <= 0 || enemy.position.y >= GetScreenHeight()) {
+    //         enemy.velocity.y *= -1;
+    //     }
 
-        // Choose a new random direction if not at bounds
-        if (enemy.position.x > 0 && enemy.position.x < GetScreenWidth() &&
-            enemy.position.y > 0 && enemy.position.y < GetScreenHeight()) {
-            float randomAngle = (rand() % 360) * DEG2RAD; // Random angle in radians
-            Vector2 randomDirection = {cos(randomAngle), sin(randomAngle)};
-            enemy.velocity = Vector2Scale(randomDirection, enemy.speed); // Apply new velocity
+    //     // Choose a new random direction if not at bounds
+    //     if (enemy.position.x > 0 && enemy.position.x < GetScreenWidth() &&
+    //         enemy.position.y > 0 && enemy.position.y < GetScreenHeight()) {
+    //         float randomAngle = (rand() % 360) * DEG2RAD; // Random angle in radians
+    //         Vector2 randomDirection = {cos(randomAngle), sin(randomAngle)};
+    //         enemy.velocity = Vector2Scale(randomDirection, enemy.speed); // Apply new velocity
+    //     }
         }
-    }
 
     // Move the enemy based on its velocity
     enemy.position = Vector2Add(enemy.position, Vector2Scale(enemy.velocity, delta_time));
 
     // Ensure the enemy stays within the screen bounds
-    enemy.position.x = fmax(0, fmin(enemy.position.x, GetScreenWidth()));
-    enemy.position.y = fmax(0, fmin(enemy.position.y, GetScreenHeight()));
+    // enemy.position.x = fmax(0, fmin(enemy.position.x, GetScreenWidth()));
+    // enemy.position.y = fmax(0, fmin(enemy.position.y, GetScreenHeight()));
 }
 
 void EnemyChasing::Update(Enemy& enemy, Player& player,float delta_time) {
