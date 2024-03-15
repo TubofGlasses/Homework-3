@@ -66,7 +66,6 @@ void EnemyAttacking::Enter(Enemy& enemy) {
 
 void EnemyWandering::Update(Enemy& enemy, Player& player, float delta_time) {
     enemy.directionChangeTimer += delta_time;
-    enemy.isChasing = false;
 
     if (enemy.rotation != 0) {
         float rotationResetSpeed = 180.0f; // Degrees per second, adjust as needed
@@ -85,6 +84,10 @@ void EnemyWandering::Update(Enemy& enemy, Player& player, float delta_time) {
             enemy.SetState(&enemy.chasing);
             return;
         }
+    }
+    if (enemy.isChasing) {
+        enemy.SetState(&enemy.chasing);
+        return;
     }
 
     // Change direction at regular intervals or if hitting screen bounds
@@ -162,7 +165,6 @@ void EnemyReadying::Update(Enemy& enemy, Player& player, float delta_time) {
 void EnemyAttacking::Update(Enemy& enemy, Player& player, float delta_time) {
     if (enemy.attackCooldown > 0) {
         enemy.attackCooldown -= delta_time;
-        return;
     }
 
     Vector2 attackDirection = {cosf(enemy.rotation * DEG2RAD), sinf(enemy.rotation * DEG2RAD)};

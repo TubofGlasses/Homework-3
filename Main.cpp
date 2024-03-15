@@ -26,19 +26,29 @@ int main() {
     while(!WindowShouldClose()) {
         float delta_time = GetFrameTime();
 
-        player.Update(enemy, delta_time);
-        enemy.Update(player, delta_time);
+        if (player.hp > 0 && enemy.hp > 0) {
+            player.Update(enemy, delta_time);
+            enemy.Update(player, delta_time);
 
-        camera_view.target = player.position;
-        camera_view.offset = {static_cast<float>(GetScreenWidth()) / 2, static_cast<float>(GetScreenHeight()) / 2};
+            camera_view.target = player.position;
 
-        BeginDrawing();
-        ClearBackground(BLACK);
-        BeginMode2D(camera_view);
-        enemy.Draw();
-        player.Draw();  
-        EndMode2D();
-        DrawText(("HP: " + std::to_string(player.hp)).c_str(), 10, 10, 20, WHITE);
+            BeginDrawing();
+            ClearBackground(BLACK);
+            BeginMode2D(camera_view);
+            enemy.Draw();
+            player.Draw();
+            EndMode2D();
+            DrawText(("HP: " + std::to_string(static_cast<int>(player.hp))).c_str(), 10, 10, 20, WHITE);
+        } else {
+            BeginDrawing();
+            ClearBackground(BLACK); // Consider changing the background color if needed
+            if (player.hp <= 0) {
+                DrawText("GAME OVER", WINDOW_WIDTH / 2 - MeasureText("GAME OVER", 60) / 2, WINDOW_HEIGHT / 2 - 30, 60, RED);
+            } else if (enemy.hp <= 0) {
+                DrawText("YOU WIN!", WINDOW_WIDTH / 2 - MeasureText("YOU WIN!", 60) / 2, WINDOW_HEIGHT / 2 - 30, 60, WHITE);
+            }
+            DrawText("Press ESC to Quit", WINDOW_WIDTH / 2 - MeasureText("Press ESC to Quit", 20) / 2, WINDOW_HEIGHT / 2 + 40, 20, WHITE);
+        }
         EndDrawing();
     }
     CloseWindow();
