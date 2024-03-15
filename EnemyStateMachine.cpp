@@ -59,6 +59,7 @@ void EnemyReadying::Enter(Enemy& enemy) {
 }
 
 void EnemyAttacking::Enter(Enemy& enemy) {
+    enemy.hasDealtDamage = false;
     enemy.color = RED;
     
 }
@@ -164,26 +165,35 @@ void EnemyAttacking::Update(Enemy& enemy, Player& player, float delta_time) {
         return;
     }
 
-    // Convert the current rotation to a direction vector for the attack
     Vector2 attackDirection = {cosf(enemy.rotation * DEG2RAD), sinf(enemy.rotation * DEG2RAD)};
 
-    // Normalize the direction vector
     attackDirection = Vector2Normalize(attackDirection);
 
-    // Increase the enemy's speed during the attack
-    float attackSpeedMultiplier = 10.0f; // Adjust the multiplier as needed
+    float attackSpeedMultiplier = 10.0f;
     float increasedSpeed = enemy.speed * attackSpeedMultiplier;
 
-    // Calculate the enemy's new position based on the attack direction and increased speed
     enemy.position = Vector2Add(enemy.position, Vector2Scale(attackDirection, increasedSpeed * delta_time));
+
+    if (CheckCollisionCircles(enemy.position, enemy.width / 2, player.position, player.radius) && !enemy.hasDealtDamage) {
+        float damage = 1.0f; 
+
+        if (player.isBlocking) {
+            damage = 0.5f;
+        } else if (player.isDodging) {
+            damage = 0.0f;
+        }
+
+        player.hp -= damage;
+        enemy.hasDealtDamage = true;
+
+        return;
+    }
 
     enemy.timer -= delta_time;
     if (enemy.timer <= 0) {
-        // Transition to another state, such as wandering, after the attack
         enemy.SetState(&enemy.wandering);
         enemy.attackCooldown = enemy.attackCooldownDuration;
     }
 
     enemy.isAttacking = false;
 }
-
