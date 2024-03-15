@@ -99,6 +99,7 @@ void PlayerMoving::Update(Player& player, float delta_time) {
     }
     if (IsKeyPressed(KEY_SPACE)) {
         player.timer = 0.2f;
+        player.isDodging = true;
         player.SetState(&player.dodging);
     }
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -115,11 +116,10 @@ void PlayerBlocking::Update(Player& player, float delta_time) {
 }
 
 void PlayerDodging::Update(Player& player, float delta_time) {
-    // std::cout << "timer " << player.timer << " speed " <<player.speed << std::endl;
-    if (player.timer >= 0) {
+    if (player.timer > 0) {
         Vector2 direction = {0.0f, 0.0f};
-        player.speed = 1000.0f;
-        player.timer -= delta_time;
+
+        // Determine the dodge direction based on the player's previous and current positions
         if (player.prevPos.y < player.position.y) {
             direction.y += 1.0f;
         }
@@ -132,14 +132,25 @@ void PlayerDodging::Update(Player& player, float delta_time) {
         if (player.prevPos.x > player.position.x) {
             direction.x -= 1.0f;
         }
+
         if (Vector2Length(direction) > 0) {
-        direction = Vector2Normalize(direction);
-        Vector2 movement = Vector2Scale(direction, player.speed * delta_time);
+            direction = Vector2Normalize(direction);
+        }
+
+        player.timer -= delta_time;
+
+        // smoother dodge
+        float lerpFactor = player.timer / 0.2f;
+        lerpFactor = fmax(lerpFactor, 0.0f);
+
+        float interpolatedSpeed = Lerp(1000.0f, 0.0f, 1.0f - lerpFactor);
+
+        Vector2 movement = Vector2Scale(direction, interpolatedSpeed * delta_time);
         player.position = Vector2Add(player.position, movement);
     }
-    }
+
     if (player.timer <= 0) {
-        player.speed = 200.0f;
+        player.isDodging = false;
         player.SetState(&player.idle);
     }
 }

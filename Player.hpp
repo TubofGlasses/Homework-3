@@ -48,7 +48,7 @@ class Player {
         Vector2 position;
         float radius;
 
-        int hp;
+        float hp;
         Color color;
 
         Vector2 velocity;
@@ -57,6 +57,7 @@ class Player {
         float timer;
 
         bool isBlocking;
+        bool isDodging;
 
         Player(Vector2 pos, float rad, float spd);
 

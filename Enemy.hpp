@@ -49,7 +49,7 @@ class Enemy {
         float height;
         float rotation;
 
-        int hp;
+        float hp;
         Color color;
 
         Vector2 velocity;
